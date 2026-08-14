@@ -1,0 +1,13 @@
+{
+  "name": "deepseek-harness-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/with-rustup.mjs pnpm --dir apps/desktop tauri:dev",
+    "build": "node scripts/with-rustup.mjs pnpm --dir apps/desktop tauri:build",
+    "upstream:dev": "node scripts/upstream.mjs dev 1420",
+    "upstream:build": "node scripts/upstream.mjs build",
+    "tauri:dev": "node scripts/with-rustup.mjs pnpm --dir apps/desktop tauri:dev",
+    "tauri:build": "node scripts/with-rustup.mjs pnpm --dir apps/desktop tauri:build"
+  }
+}

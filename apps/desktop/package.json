@@ -1,0 +1,12 @@
+{
+  "name": "@deepseek-harness-app/desktop",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@tauri-apps/cli": "2.6.0"
+  }
+}

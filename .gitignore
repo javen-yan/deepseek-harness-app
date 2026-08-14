@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.turbo
+.vite
+*.log
+apps/desktop/src-tauri/target
+.DS_Store
+

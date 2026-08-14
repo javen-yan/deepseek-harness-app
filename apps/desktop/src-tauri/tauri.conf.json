@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Deepseek Harness",
+  "version": "0.1.0",
+  "identifier": "com.deepseek.harness.desktop",
+  "build": {
+    "beforeDevCommand": "node ../../scripts/upstream.mjs dev 1420",
+    "beforeBuildCommand": "node ../../scripts/upstream.mjs build",
+    "devUrl": "http://127.0.0.1:1420",
+    "frontendDist": "../src"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Deepseek Harness",
+        "width": 1280,
+        "height": 880,
+        "minWidth": 1100,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "url": "index.html"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "createUpdaterArtifacts": true,
+    "resources": [
+      "runtime/*"
+    ],
+    "icon": [
+      "icons/icon.ico",
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.icns"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "REPLACE_WITH_TAURI_PUBLIC_KEY",
+      "endpoints": [
+        "https://updates.example.com/deepseek-harness-app/{{target}}/{{arch}}/{{current_version}}"
+      ]
+    }
+  }
+}

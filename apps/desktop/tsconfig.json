@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@deepseek-harness-app/shell-state": ["../../packages/shell-state/src/index.ts"],
+      "@deepseek-harness-app/shell-core": ["../../packages/shell-core/src/index.ts"],
+      "@deepseek-harness-app/shell-bridge": ["../../packages/shell-bridge/src/index.ts"],
+      "@deepseek-harness-app/shell-ui": ["../../packages/shell-ui/src/index.tsx"]
+    }
+  },
+  "include": ["src", "../../packages/*/src", "../../packages/*/tests", "vite.config.ts", "vitest.config.ts"]
+}
+
