@@ -1,0 +1,49 @@
+# Deepseek Harness 0.1.0
+
+Generated: 2026-08-14
+
+## Snapshot
+
+| Field | Value |
+| --- | --- |
+| App version | 0.1.0 |
+| Upstream version | 0.1.0-rc.5 |
+| Upstream commit | 47f9438 |
+| Release model | installable desktop app, no tag gate |
+
+## Release rules
+
+- Ordinary commits do not publish anything.
+- Git tags do not publish anything.
+- A release build snapshots the current checkout plus the pinned upstream submodule commit.
+- The release docs are generated from this checkout, so the published note always matches the packaged build.
+
+## Release checklist
+
+- [ ] Release build uses the current checkout and the pinned upstream submodule commit.
+- [ ] Updater pubkey and endpoint are set for the target release environment.
+- [ ] Signing key is present in the build environment.
+- [ ] Bundled runtime staged successfully with `pnpm desktop:stage-runtime`.
+- [ ] macOS installer is notarized and opens cleanly from Applications.
+- [ ] Windows installer is signed and launches without the shell depending on Git, pnpm, or a local checkout.
+- [ ] Linux package starts the bundled runtime on a clean machine.
+
+## macOS safe install
+
+- Download the signed and notarized `.dmg` from the release page.
+- Open the disk image and drag `Deepseek Harness.app` into `Applications`.
+- Eject the disk image after copying finishes.
+- Launch from `Applications`; if Gatekeeper still prompts on a managed machine, use the normal macOS Open flow once, not a bypass for unsigned builds.
+- Verify the About dialog shows the expected app version and upstream version.
+
+## Platform artifacts
+
+- Windows: NSIS or MSI, plus updater artifact.
+- macOS: signed `.app` / `.dmg`, plus updater archive and notarization.
+- Linux: AppImage or distro package, plus updater artifact where supported.
+
+## Publishing notes
+
+- Publish the installers and updater metadata from the release build, not from a tag hook.
+- Keep the updater endpoint versioned by app version, not by Git branch name.
+- Keep the pinned upstream commit in the release note and changelog.

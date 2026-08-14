@@ -1,0 +1,124 @@
+name: Publish release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux
+            os: ubuntu-22.04
+          - name: windows
+            os: windows-latest
+          - name: macos
+            os: macos-latest
+
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Linux dependencies
+        if: matrix.name == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@1.88.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build release bundle
+        run: pnpm build
+
+      - name: Collect release assets
+        run: node scripts/collect-release-assets.mjs "apps/desktop/src-tauri/target/release/bundle" "release-assets/${{ matrix.name }}"
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ matrix.name }}
+          path: release-assets/${{ matrix.name }}
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Create GitHub release
+    runs-on: ubuntu-22.04
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Read app version
+        id: version
+        run: |
+          version=$(node -e "const fs=require('node:fs'); const config=JSON.parse(fs.readFileSync('apps/desktop/src-tauri/tauri.conf.json', 'utf8')); process.stdout.write(String(config.version))")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release notes
+        run: node scripts/release-notes.mjs
+
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-assets-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Ensure asset directory exists
+        run: mkdir -p release-assets
+
+      - name: Copy release notes into assets
+        run: cp docs/releases/current.md release-assets/release-notes.md
+
+      - name: Publish release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version.outputs.version }}
+          commit: ${{ github.sha }}
+          name: Deepseek Harness v${{ steps.version.outputs.version }}
+          bodyFile: release-assets/release-notes.md
+          artifacts: release-assets/**/*
+          replacesArtifacts: true
+          allowUpdates: true
+          artifactErrorsFailBuild: true

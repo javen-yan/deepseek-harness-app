@@ -19,14 +19,18 @@ function candidateRoots() {
 
 function resolveRuntimeRoot() {
   for (const root of candidateRoots()) {
+    if (existsSync(join(root, 'lib/bin.js'))) return root
     if (existsSync(join(root, 'apps/cli/lib/bin.js'))) return root
   }
   throw new Error([
-    'Deepseek Harness runtime launcher could not find apps/cli/lib/bin.js.',
+    'Deepseek Harness runtime launcher could not find lib/bin.js.',
     'Set DEEPSEEK_HARNESS_RUNTIME_ROOT to the packaged deepseek-harness checkout.',
   ].join(' '))
 }
 
 const runtimeRoot = resolveRuntimeRoot()
 process.chdir(runtimeRoot)
-await import(pathToFileURL(join(runtimeRoot, 'apps/cli/lib/bin.js')).href)
+const entry = existsSync(join(runtimeRoot, 'lib/bin.js'))
+  ? join(runtimeRoot, 'lib/bin.js')
+  : join(runtimeRoot, 'apps/cli/lib/bin.js')
+await import(pathToFileURL(entry).href)

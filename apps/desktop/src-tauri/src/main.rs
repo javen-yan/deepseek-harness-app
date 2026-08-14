@@ -87,7 +87,7 @@ fn setup_shell(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             AboutMetadataBuilder::new()
                 .name(Some(APP_NAME))
                 .version(Some(APP_VERSION))
-                .website(Some("https://github.com/deepseek-ai/deepseek-harness-app"))
+                .website(Some("https://github.com/javen-yan/deepseek-harness-app"))
                 .website_label(Some("Project repository"))
                 .copyright(Some("MIT"))
                 .icon(Some(Image::from_bytes(include_bytes!(
@@ -147,14 +147,6 @@ fn setup_shell(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
 
     if let Some(runtime) = runtime::bootstrap(app.handle().clone())? {
         app.manage(runtime);
-    }
-
-    #[cfg(not(debug_assertions))]
-    {
-        let handle = app.handle().clone();
-        tauri::async_runtime::spawn(async move {
-            trigger_update_check(handle).await;
-        });
     }
 
     Ok(())

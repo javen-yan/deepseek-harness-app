@@ -4,8 +4,9 @@ Desktop host for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harn
 
 This repository packages the upstream harness as a native Tauri app. It does
 not fork the agent logic or the web UI. Instead, it boots the pinned upstream
-`deepseek-harness` source from `submodules/deepseek-harness` and renders the
-local web profile inside a desktop WebView.
+`deepseek-harness` source from `submodules/deepseek-harness` during
+development, stages a bundled runtime closure for release builds, and renders
+the local web profile inside a desktop WebView.
 
 ## What this repo owns
 
@@ -16,6 +17,7 @@ local web profile inside a desktop WebView.
 
 ## Upstream relationship
 
+- App source of truth: [deepseek-harness-app](https://github.com/javen-yan/deepseek-harness-app)
 - Upstream source of truth: [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)
 - Pinned checkout in this repo: `submodules/deepseek-harness`
 - The upstream submodule provides the agent, web app, plugins, and runtime
@@ -46,6 +48,8 @@ release model.
 - `apps/desktop`: Tauri desktop host
 - `submodules/deepseek-harness`: pinned upstream harness source
 - `scripts/upstream.mjs`: upstream build/dev bridge
+- `scripts/desktop-runtime.mjs`: release staging for the upstream runtime and
+  packaged Node binary
 - `docs/`: architecture, design, platform, release, and checklist notes
 
 ## Quick start
@@ -61,8 +65,13 @@ pnpm dev
 ```bash
 pnpm upstream:dev
 pnpm upstream:build
+pnpm desktop:stage-runtime
+pnpm release:docs
+pnpm release:build
 pnpm build
 ```
+
+Release signing example: [release.env.example](release.env.example)
 
 ## Development notes
 
@@ -70,8 +79,8 @@ pnpm build
   window to the emitted loopback URL.
 - Native app actions live in the Tauri shell, while the upstream harness keeps
   ownership of the agent experience.
-- Release builds are expected to bundle the runtime closure so end users do not
-  need to clone the repo or install upstream dependencies.
+- Release builds bundle the runtime closure and a packaged Node binary so end
+  users do not need to clone the repo or install upstream dependencies.
 
 ## Docs
 

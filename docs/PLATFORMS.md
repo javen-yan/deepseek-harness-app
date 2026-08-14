@@ -46,6 +46,7 @@ The release pipeline must package the upstream runtime dependency closure:
 - upstream CLI/runtime entry required to run `dsh --profile web`,
 - the launcher script that resolves the runtime root and prints the loopback URL,
 - any runtime `node_modules` or compiled sidecar required by upstream,
+- a packaged Node binary so the installed app does not depend on a system Node,
 - platform-specific sidecar metadata if the runtime is shipped as a sidecar.
 
 If upstream cannot be reduced to static assets, the desktop app must bundle a

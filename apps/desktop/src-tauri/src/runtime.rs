@@ -73,7 +73,7 @@ fn spawn_release_runtime(app: AppHandle) -> Result<RuntimeGuard, Box<dyn Error>>
 
     let runtime_root = runtime_root(&app)?;
     let launcher = runtime_script(&app)?;
-    let node = node_binary();
+    let node = node_binary(&app)?;
 
     let mut command = Command::new(node);
     command
@@ -161,8 +161,30 @@ fn runtime_script(app: &AppHandle) -> Result<PathBuf, Box<dyn Error>> {
 }
 
 #[cfg(not(debug_assertions))]
-fn node_binary() -> String {
-    std::env::var(NODE_BINARY_ENV).unwrap_or_else(|_| String::from("node"))
+fn node_binary(app: &AppHandle) -> Result<PathBuf, Box<dyn Error>> {
+    if let Ok(binary) = app
+        .path()
+        .resolve(node_binary_relative_path(), BaseDirectory::Resource)
+    {
+        if binary.exists() {
+            return Ok(binary);
+        }
+    }
+
+    if let Ok(binary) = std::env::var(NODE_BINARY_ENV) {
+        return Ok(PathBuf::from(binary));
+    }
+
+    Ok(PathBuf::from("node"))
+}
+
+#[cfg(not(debug_assertions))]
+fn node_binary_relative_path() -> &'static str {
+    if cfg!(windows) {
+        "runtime/node/node.exe"
+    } else {
+        "runtime/node/node"
+    }
 }
 
 #[cfg(not(debug_assertions))]

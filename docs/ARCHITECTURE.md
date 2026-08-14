@@ -33,13 +33,14 @@ flowchart TD
   reproducible development and release builds.
 - Release builds must not require end users to initialize submodules or install
   upstream npm dependencies.
-- Desktop builds run the upstream production build first, then package the
-  runtime dependency closure needed to launch the web profile locally.
+- Desktop builds run the upstream production build first, then materialize a
+  deploy root for `@deepseek-ai/dsh` and copy it into `src-tauri/runtime`.
 - The release host boots a tiny launcher script from `src-tauri/runtime`, which
-  resolves the packaged runtime root, starts `dsh --profile web --port 0`, and
-  redirects the window to the emitted loopback URL.
-- Tauri then packages the native desktop host, upstream runtime assets, and
-  updater artifacts.
+  resolves the packaged runtime root, starts the packaged Node binary with
+  `dsh --profile web --port 0`, and redirects the window to the emitted
+  loopback URL.
+- Tauri packages the native desktop host, upstream runtime assets, the packaged
+  Node binary, and updater artifacts.
 
 ## Dependency model
 
@@ -48,10 +49,11 @@ flowchart TD
 - End users install platform artifacts only. They should not download the
   submodule, run `pnpm install`, or manage a Node workspace.
 - Any runtime requirement from upstream must be bundled as an app resource or
-  sidecar before release.
+  sidecar before release. For this app, that means the deployed `dsh` runtime
+  tree and the build-host Node binary copied into `runtime/node/`.
 
 ## Update model
 
-- The app checks signed update metadata on startup.
+- The app exposes signed update checks through the App menu and release flow.
 - Release artifacts are signed before publication.
 - The updater verifies the signature before installing.

@@ -9,6 +9,7 @@
 - [ ] The pinned upstream submodule commit is intentional.
 - [ ] The updater pubkey and endpoint are set for the target environment.
 - [ ] The release key is available in the build environment.
+- [ ] `pnpm release:docs` writes the current release note with app version, upstream version, and upstream commit.
 - [ ] No generated artifacts are committed.
 
 ## Before release
@@ -26,3 +27,4 @@
 - [ ] Verify Linux packaging on the supported distribution baseline.
 - [ ] Verify the README matches the current build and release flow.
 - [ ] Verify the release notes mention the pinned upstream commit.
+- [ ] Verify the macOS install note matches the notarized installer flow.
