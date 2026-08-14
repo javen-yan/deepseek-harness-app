@@ -94,6 +94,21 @@ async function main() {
   await rm(upstreamDeployRoot, { recursive: true, force: true })
 
   await run(pnpmBin, [
+    'install',
+    '--frozen-lockfile',
+    '--ignore-scripts',
+  ], upstreamRoot, {
+    ...process.env,
+    CI: 'true',
+    npm_config_ignore_scripts: 'true',
+  })
+
+  await run(pnpmBin, [
+    'run',
+    'build',
+  ], upstreamRoot, { ...process.env, CI: 'true' })
+
+  await run(pnpmBin, [
     '--dir',
     upstreamRoot,
     '--filter',
@@ -101,7 +116,6 @@ async function main() {
     'deploy',
     '--legacy',
     '--prod',
-    '--ignore-scripts',
     '--config.node-linker=hoisted',
     '--config.auto-install-peers=false',
     '--config.link-workspace-packages=true',
