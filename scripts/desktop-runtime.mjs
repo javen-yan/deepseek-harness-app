@@ -101,6 +101,7 @@ async function main() {
     'deploy',
     '--legacy',
     '--prod',
+    '--ignore-scripts',
     '--config.node-linker=hoisted',
     '--config.auto-install-peers=false',
     '--config.link-workspace-packages=true',

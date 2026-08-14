@@ -4,60 +4,423 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Deepseek Harness</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cpath fill='%234d6bfe' d='M48.8354 10.0479C48.3232 9.79199 48.1025 10.2798 47.8032 10.5278C47.7007 10.6079 47.6143 10.7119 47.5273 10.8076C46.7793 11.624 45.9048 12.1597 44.7622 12.0957C43.0923 12 41.666 12.5356 40.4058 13.8398C40.1377 12.2319 39.2476 11.272 37.8926 10.6558C37.1836 10.3359 36.4668 10.0156 35.9702 9.31982C35.6235 8.82373 35.5293 8.27197 35.356 7.72754C35.2456 7.3999 35.1353 7.06396 34.7651 7.00781C34.3633 6.94385 34.2056 7.2876 34.0479 7.57568C33.418 8.75195 33.1733 10.0479 33.1973 11.3599C33.2524 14.312 34.4736 16.6641 36.8999 18.3359C37.1758 18.5278 37.2466 18.7197 37.1597 19C36.9946 19.5757 36.7974 20.1357 36.624 20.7119C36.5137 21.0801 36.3486 21.1597 35.9624 21C34.6309 20.4321 33.481 19.5918 32.4644 18.5757C30.7393 16.8721 29.1792 14.9917 27.2334 13.52C26.7764 13.1758 26.3193 12.856 25.8467 12.5518C23.8618 10.584 26.1069 8.96777 26.627 8.77588C27.1704 8.57568 26.8159 7.8877 25.0591 7.896C23.3022 7.90381 21.6953 8.50391 19.647 9.30371C19.3477 9.42383 19.0322 9.51172 18.7095 9.58398C16.8501 9.22363 14.9199 9.14355 12.9033 9.37598C9.10596 9.80762 6.07275 11.6396 3.84326 14.7681C1.16455 18.5278 0.53418 22.7998 1.30664 27.2559C2.11768 31.9521 4.46582 35.8398 8.07373 38.8799C11.8159 42.0322 16.1255 43.5762 21.041 43.2803C24.0269 43.104 27.3516 42.6963 31.1016 39.4561C32.0469 39.936 33.0396 40.1279 34.686 40.272C35.9546 40.3921 37.1758 40.208 38.1211 40.0078C39.6021 39.688 39.4995 38.2881 38.9639 38.0322C34.623 35.9678 35.5762 36.8081 34.71 36.1279C36.9155 33.4639 40.2402 30.6958 41.54 21.728C41.6426 21.0161 41.5557 20.5679 41.54 19.9917C41.5322 19.6396 41.6108 19.5039 42.0049 19.4639C43.0923 19.3359 44.1479 19.0317 45.1167 18.4878C47.9292 16.9199 49.064 14.3438 49.3315 11.2559C49.3711 10.7837 49.3237 10.2959 48.8354 10.0479Z'/%3E%3C/svg%3E"
+    />
     <style>
       :root {
         color-scheme: light;
-        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f7f8fb;
-        color: #1e293b;
+        --bg: #ffffff;
+        --bg-2: #f4f7ff;
+        --brand: #4d6bfe;
+        --brand-2: #6b8aff;
+        --brand-3: #b9c8ff;
+        --ink: #0f1733;
+        --ink-dim: #5b6786;
+        --ink-faint: #98a3c4;
+        --line: rgba(77, 107, 254, 0.1);
+        --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+        --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       html,
       body {
         margin: 0;
-        min-height: 100%;
-        background:
-          linear-gradient(180deg, #ffffff 0%, #f7f8fb 100%);
+        height: 100%;
       }
 
       body {
-        min-height: 100vh;
+        font-family: var(--sans);
+        color: var(--ink);
+        background: radial-gradient(120% 90% at 50% -10%, #eaf0ff 0%, var(--bg-2) 40%, var(--bg) 100%);
+        overflow: hidden;
         display: grid;
         place-items: center;
+        -webkit-font-smoothing: antialiased;
       }
+
+      /* ---------- background layers ---------- */
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .bg-grid {
+        position: absolute;
+        inset: -40%;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 52px 52px;
+        transform: perspective(600px) rotateX(52deg) translateY(8%);
+        transform-origin: center top;
+        animation: grid-pan 26s linear infinite;
+        opacity: 0.9;
+        mask-image: radial-gradient(70% 60% at 50% 42%, #000 0%, transparent 78%);
+        -webkit-mask-image: radial-gradient(70% 60% at 50% 42%, #000 0%, transparent 78%);
+      }
+
+      @keyframes grid-pan {
+        from { background-position: 0 0, 0 0; }
+        to { background-position: 0 52px, 0 0; }
+      }
+
+      .bg-aurora {
+        position: absolute;
+        left: 50%;
+        top: 42%;
+        width: 70vmax;
+        height: 70vmax;
+        transform: translate(-50%, -50%);
+        background:
+          radial-gradient(circle at 50% 50%, rgba(77, 107, 254, 0.12) 0%, rgba(77, 107, 254, 0.04) 36%, transparent 64%);
+        animation: aurora-breathe 7s ease-in-out infinite;
+      }
+
+      @keyframes aurora-breathe {
+        0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+      }
+
+      .bg-scan {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 140px;
+        background: linear-gradient(180deg, transparent, rgba(77, 107, 254, 0.05), transparent);
+        animation: scan 7s ease-in-out infinite;
+      }
+
+      @keyframes scan {
+        0% { top: -20%; }
+        55% { top: 108%; }
+        100% { top: 108%; }
+      }
+
+      .particles {
+        position: absolute;
+        inset: 0;
+      }
+
+      .particle {
+        position: absolute;
+        left: var(--x);
+        bottom: -12px;
+        width: var(--s);
+        height: var(--s);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(107, 138, 255, 0.75), transparent 70%);
+        opacity: 0;
+        animation: rise var(--d) linear infinite;
+        animation-delay: var(--delay);
+      }
+
+      @keyframes rise {
+        0% { transform: translateY(0) translateX(0); opacity: 0; }
+        8% { opacity: 0.9; }
+        80% { opacity: 0.5; }
+        100% { transform: translateY(-110vh) translateX(var(--drift)); opacity: 0; }
+      }
+
+      /* ---------- layout ---------- */
 
       main {
-        max-width: 34rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2.4rem;
         padding: 3rem 2rem;
         text-align: center;
+        max-width: 40rem;
       }
 
-      h1 {
-        margin: 0 0 0.75rem;
-        font-size: 2rem;
-        line-height: 1.15;
-        letter-spacing: 0;
+      /* ---------- orb / loader ---------- */
+
+      .orb-wrap {
+        position: relative;
+        display: grid;
+        justify-items: center;
       }
 
-      p {
+      .orb {
+        position: relative;
+        width: 190px;
+        height: 190px;
+        display: grid;
+        place-items: center;
+        animation: float 3.6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-14px) rotate(-1.2deg); }
+      }
+
+      .ring {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .ring-glow {
+        inset: 8px;
+        background: radial-gradient(circle, rgba(77, 107, 254, 0.16) 0%, rgba(77, 107, 254, 0.06) 45%, transparent 70%);
+        filter: blur(2px);
+        animation: glow-pulse 3.6s ease-in-out infinite;
+      }
+
+      @keyframes glow-pulse {
+        0%, 100% { opacity: 0.7; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.06); }
+      }
+
+      .ring-dash {
+        inset: 0;
+        border: 1px dashed rgba(77, 107, 254, 0.26);
+        animation: spin 26s linear infinite;
+      }
+
+      .ring-dash-2 {
+        inset: -16px;
+        border: 1px dashed rgba(77, 107, 254, 0.13);
+        animation: spin 40s linear infinite reverse;
+      }
+
+      .ring-orbit {
+        inset: -28px;
+        animation: spin 9s linear infinite;
+      }
+
+      .ring-orbit .dot {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 7px;
+        height: 7px;
+        margin: -3.5px;
+        border-radius: 50%;
+        background: var(--brand-2);
+        box-shadow: 0 0 10px 2px rgba(77, 107, 254, 0.45);
+      }
+
+      .ring-orbit .dot-2 {
+        top: auto;
+        bottom: 0;
+        left: 50%;
+        width: 4px;
+        height: 4px;
+        margin: -2px;
+        background: var(--brand-2);
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .scanner {
+        position: absolute;
+        inset: 2px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, transparent 0deg, rgba(77, 107, 254, 0.2) 40deg, transparent 90deg);
+        animation: spin 4.5s linear infinite;
+        -webkit-mask-image: radial-gradient(circle, transparent 62%, #000 63%);
+        mask-image: radial-gradient(circle, transparent 62%, #000 63%);
+      }
+
+      .orb-core {
+        position: absolute;
+        width: 128px;
+        height: 128px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 38%, #ffffff 0%, #f3f6ff 55%, #e8edff 100%);
+        border: 1px solid rgba(77, 107, 254, 0.16);
+        box-shadow:
+          inset 0 0 28px rgba(77, 107, 254, 0.06),
+          0 8px 40px rgba(77, 107, 254, 0.16),
+          0 2px 8px rgba(15, 23, 51, 0.06);
+      }
+
+      .logo {
+        position: relative;
+        width: 88px;
+        height: 88px;
+        z-index: 2;
+        filter: drop-shadow(0 4px 16px rgba(77, 107, 254, 0.28));
+      }
+
+      .logo svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      /* soft reflection under the floating logo */
+      .shadow {
+        width: 130px;
+        height: 16px;
+        margin-top: -1.4rem;
+        border-radius: 50%;
+        background: radial-gradient(ellipse at center, rgba(77, 107, 254, 0.18) 0%, transparent 70%);
+        filter: blur(8px);
+        animation: shadow-pulse 3.6s ease-in-out infinite;
+      }
+
+      @keyframes shadow-pulse {
+        0%, 100% { opacity: 0.5; transform: scale(1); }
+        50% { opacity: 0.85; transform: scale(0.82); }
+      }
+
+      /* ---------- status text ---------- */
+
+      .status h1 {
+        margin: 0 0 0.65rem;
+        font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--ink);
+        text-shadow: 0 0 20px rgba(77, 107, 254, 0.14);
+      }
+
+      .status p {
         margin: 0;
-        font-size: 1rem;
+        font-size: 0.92rem;
         line-height: 1.6;
-        color: #475569;
+        color: var(--ink-dim);
+        white-space: pre-line;
+        font-family: var(--mono);
+        letter-spacing: 0.01em;
+        min-height: 1.6em;
       }
 
-      .muted {
-        margin-top: 0.75rem;
-        font-size: 0.875rem;
-        color: #94a3b8;
+      /* ---------- progress ---------- */
+
+      .progress {
+        width: min(320px, 76vw);
+        height: 3px;
+        border-radius: 999px;
+        background: rgba(77, 107, 254, 0.12);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress .bar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 42%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, transparent, var(--brand) 30%, var(--brand-2) 70%, transparent);
+        box-shadow: 0 0 10px rgba(77, 107, 254, 0.4);
+        animation: slide 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      @keyframes slide {
+        0% { left: -45%; }
+        100% { left: 110%; }
+      }
+
+      /* ---------- brand ---------- */
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+
+      .brand svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .brand .tag {
+        padding: 0.14rem 0.5rem;
+        border: 1px solid rgba(77, 107, 254, 0.18);
+        border-radius: 999px;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        color: var(--brand);
+        background: rgba(77, 107, 254, 0.06);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+        }
       }
     </style>
   </head>
   <body>
+    <div class="bg" aria-hidden="true">
+      <div class="bg-grid"></div>
+      <div class="bg-aurora"></div>
+      <div class="bg-scan"></div>
+      <div class="particles">
+        <span class="particle" style="--x: 12%; --s: 4px; --d: 11s; --delay: 0s; --drift: 30px"></span>
+        <span class="particle" style="--x: 22%; --s: 3px; --d: 13s; --delay: 2.4s; --drift: -26px"></span>
+        <span class="particle" style="--x: 34%; --s: 5px; --d: 9s; --delay: 1.1s; --drift: 18px"></span>
+        <span class="particle" style="--x: 47%; --s: 3px; --d: 14s; --delay: 3.2s; --drift: -34px"></span>
+        <span class="particle" style="--x: 58%; --s: 4px; --d: 10s; --delay: 0.6s; --drift: 22px"></span>
+        <span class="particle" style="--x: 69%; --s: 5px; --d: 12s; --delay: 4.1s; --drift: -20px"></span>
+        <span class="particle" style="--x: 78%; --s: 3px; --d: 8s; --delay: 1.9s; --drift: 28px"></span>
+        <span class="particle" style="--x: 87%; --s: 4px; --d: 11s; --delay: 2.9s; --drift: -24px"></span>
+      </div>
+    </div>
+
     <main>
-      <h1 id="boot-title">Launching harness</h1>
-      <p id="boot-body">Starting the bundled web profile.</p>
-      <p class="muted">Deepseek Harness</p>
+      <div class="orb-wrap">
+        <div class="orb">
+          <span class="ring ring-glow"></span>
+          <span class="ring ring-dash"></span>
+          <span class="ring ring-dash-2"></span>
+          <span class="ring ring-orbit"><span class="dot"></span><span class="dot dot-2"></span></span>
+          <span class="scanner"></span>
+          <div class="orb-core"></div>
+          <div class="logo">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DeepSeek">
+              <defs>
+                <linearGradient id="ds-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#7c9bff" />
+                  <stop offset="1" stop-color="#4d6bfe" />
+                </linearGradient>
+              </defs>
+              <path fill="url(#ds-grad)" d="M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.5 5.5 0 0 1-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11 11 0 0 0-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428s-1.67.295-2.687.684a3 3 0 0 1-.465.137 9.6 9.6 0 0 0-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.2 4.2 0 0 0 1.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588zM11.581 18c-2.089-1.642-3.102-2.183-3.52-2.16-.392.024-.321.471-.235.763.09.288.207.486.371.739.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.167-1.361-.802-2.5-1.86-3.301-3.307-.774-1.393-1.224-2.887-1.298-4.482-.02-.386.093-.522.477-.592a4.7 4.7 0 0 1 1.529-.039c2.132.312 3.946 1.265 5.468 2.774.868.86 1.525 1.887 2.202 2.891.72 1.066 1.494 2.082 2.48 2.914.348.292.625.514.891.677-.802.09-2.14.11-3.054-.614m1-6.44a.306.306 0 0 1 .415-.287.3.3 0 0 1 .2.288.306.306 0 0 1-.31.307.303.303 0 0 1-.304-.308zm3.11 1.596c-.2.081-.399.151-.59.16a1.25 1.25 0 0 1-.798-.254c-.274-.23-.47-.358-.552-.758a1.7 1.7 0 0 1 .016-.588c.07-.327-.008-.537-.239-.727-.187-.156-.426-.199-.688-.199a.56.56 0 0 1-.254-.078.253.253 0 0 1-.114-.358c.028-.054.16-.186.192-.21.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.391.451.462.576.685.914.176.265.336.537.445.848.067.195-.019.354-.25.452" />
+            </svg>
+          </div>
+        </div>
+        <div class="shadow" aria-hidden="true"></div>
+      </div>
+
+      <div class="status">
+        <h1 id="boot-title">Launching harness</h1>
+        <p id="boot-body">Starting the bundled web profile.</p>
+      </div>
+
+      <div class="progress" aria-hidden="true">
+        <span class="bar"></span>
+      </div>
+
+      <div class="brand">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="currentColor" d="M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.5 5.5 0 0 1-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11 11 0 0 0-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428s-1.67.295-2.687.684a3 3 0 0 1-.465.137 9.6 9.6 0 0 0-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.2 4.2 0 0 0 1.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588zM11.581 18c-2.089-1.642-3.102-2.183-3.52-2.16-.392.024-.321.471-.235.763.09.288.207.486.371.739.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.167-1.361-.802-2.5-1.86-3.301-3.307-.774-1.393-1.224-2.887-1.298-4.482-.02-.386.093-.522.477-.592a4.7 4.7 0 0 1 1.529-.039c2.132.312 3.946 1.265 5.468 2.774.868.86 1.525 1.887 2.202 2.891.72 1.066 1.494 2.082 2.48 2.914.348.292.625.514.891.677-.802.09-2.14.11-3.054-.614m1-6.44a.306.306 0 0 1 .415-.287.3.3 0 0 1 .2.288.306.306 0 0 1-.31.307.303.303 0 0 1-.304-.308zm3.11 1.596c-.2.081-.399.151-.59.16a1.25 1.25 0 0 1-.798-.254c-.274-.23-.47-.358-.552-.758a1.7 1.7 0 0 1 .016-.588c.07-.327-.008-.537-.239-.727-.187-.156-.426-.199-.688-.199a.56.56 0 0 1-.254-.078.253.253 0 0 1-.114-.358c.028-.054.16-.186.192-.21.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.391.451.462.576.685.914.176.265.336.537.445.848.067.195-.019.354-.25.452" />
+        </svg>
+        <span>DeepSeek Harness</span>
+        <span class="tag">Loading</span>
+      </div>
     </main>
   </body>
 </html>
