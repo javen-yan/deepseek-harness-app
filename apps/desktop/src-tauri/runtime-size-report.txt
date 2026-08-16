@@ -1,0 +1,65 @@
+# Runtime size report
+
+runtime: 359.0 MB
+deepseek-harness: 251.3 MB
+node: 107.8 MB
+node_modules: 251.2 MB
+
+## Top node_modules entries
+  61.4 MB  deepseek-harness/node_modules/node-pty
+  17.0 MB  deepseek-harness/node_modules/@img/sharp-libvips-darwin-arm64
+  13.9 MB  deepseek-harness/node_modules/@earendil-works/pi-ai
+  13.7 MB  deepseek-harness/node_modules/@google/genai
+  11.5 MB  deepseek-harness/node_modules/@opentelemetry/semantic-conventions
+   8.3 MB  deepseek-harness/node_modules/@shikijs/langs
+   7.4 MB  deepseek-harness/node_modules/@mixmark-io/domino
+   7.2 MB  deepseek-harness/node_modules/openai
+   6.7 MB  deepseek-harness/node_modules/web-streams-polyfill
+   4.5 MB  deepseek-harness/node_modules/@modelcontextprotocol/sdk
+   4.4 MB  deepseek-harness/node_modules/@deepseek-ai/dsh-web-frontend
+   4.3 MB  deepseek-harness/node_modules/zod
+   4.3 MB  deepseek-harness/node_modules/@vscode/ripgrep-darwin-arm64
+   4.3 MB  deepseek-harness/node_modules/react-dom
+   4.0 MB  deepseek-harness/node_modules/katex
+   3.9 MB  deepseek-harness/node_modules/@anthropic-ai/sdk
+   2.9 MB  deepseek-harness/node_modules/protobufjs
+   2.3 MB  deepseek-harness/node_modules/@types/node
+   1.8 MB  deepseek-harness/node_modules/@opentelemetry/sdk-metrics
+   1.7 MB  deepseek-harness/node_modules/koffi
+   1.7 MB  deepseek-harness/node_modules/@smithy/core
+   1.4 MB  deepseek-harness/node_modules/@deepseek-ai/dsh-typert-generator
+   1.4 MB  deepseek-harness/node_modules/@shikijs/themes
+   1.4 MB  deepseek-harness/node_modules/typebox
+   1.3 MB  deepseek-harness/node_modules/hono
+   1.2 MB  deepseek-harness/node_modules/@koromix/koffi-darwin-arm64
+   1.0 MB  deepseek-harness/node_modules/@deepseek-ai/dsh-session-telemetry-otel
+1013.5 KB  deepseek-harness/node_modules/@opentelemetry/otlp-transformer
+1009.3 KB  deepseek-harness/node_modules/ajv
+ 977.9 KB  deepseek-harness/node_modules/@opentelemetry/api
+ 974.1 KB  deepseek-harness/node_modules/oniguruma-to-es
+ 936.0 KB  deepseek-harness/node_modules/sharp
+ 935.5 KB  deepseek-harness/node_modules/js-yaml
+ 919.7 KB  deepseek-harness/node_modules/@aws-sdk/nested-clients
+ 824.1 KB  deepseek-harness/node_modules/@aws-sdk/client-bedrock-runtime
+ 778.1 KB  deepseek-harness/node_modules/fflate
+ 773.1 KB  deepseek-harness/node_modules/@opentelemetry/sdk-trace
+ 747.1 KB  deepseek-harness/node_modules/@deepseek-ai/dsh-acp-snapshot
+ 741.8 KB  deepseek-harness/node_modules/@deepseek-ai/dsh-host-apiproxy
+ 669.9 KB  deepseek-harness/node_modules/yaml
+ 663.1 KB  deepseek-harness/node_modules/gaxios
+ 649.7 KB  deepseek-harness/node_modules/google-auth-library
+ 648.4 KB  deepseek-harness/node_modules/oniguruma-parser
+ 642.1 KB  deepseek-harness/node_modules/@deepseek-ai/dsh-client-ui-conversation
+ 628.8 KB  deepseek-harness/node_modules/@shikijs/engine-oniguruma
+ 612.7 KB  deepseek-harness/node_modules/immer
+ 610.4 KB  deepseek-harness/node_modules/@deepseek-ai/dsh-client-runtime
+ 601.2 KB  deepseek-harness/node_modules/diff
+ 588.7 KB  deepseek-harness/node_modules/shiki
+ 571.9 KB  deepseek-harness/node_modules/.pnpm
+
+## Native prebuilds
+  17.0 MB  deepseek-harness/node_modules/@img/sharp-libvips-darwin-arm64
+   4.3 MB  deepseek-harness/node_modules/@vscode/ripgrep-darwin-arm64
+ 285.4 KB  deepseek-harness/node_modules/@img/sharp-darwin-arm64
+  71.5 KB  deepseek-harness/node_modules/@img/colour
+   4.3 KB  deepseek-harness/node_modules/@vscode/ripgrep

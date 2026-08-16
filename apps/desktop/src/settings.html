@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deepseek Harness Settings</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #ffffff;
+        --sidebar: #f6f7f9;
+        --panel: #fbfcfd;
+        --line: #e1e5eb;
+        --line-strong: #c9d0da;
+        --text: #171a21;
+        --muted: #707784;
+        --faint: #9aa2af;
+        --accent: #2588f7;
+        --danger: #b42318;
+        --ok: #17803d;
+        --warn-bg: #fff8e8;
+        --warn-text: #725411;
+        --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+        --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        font-family: var(--sans);
+        color: var(--text);
+        background: var(--bg);
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .shell {
+        height: 100vh;
+        display: grid;
+        grid-template-columns: 214px 1fr;
+      }
+
+      .sidebar {
+        background: var(--sidebar);
+        border-right: 1px solid var(--line);
+        padding: 18px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 6px 8px;
+      }
+
+      .brand-mark {
+        width: 31px;
+        height: 31px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        background: #15171c;
+        color: #fff;
+        font-weight: 800;
+      }
+
+      .brand-title { font-size: 14px; font-weight: 760; }
+      .brand-sub { margin-top: 2px; color: var(--muted); font-size: 11px; }
+
+      .nav {
+        display: grid;
+        gap: 5px;
+      }
+
+      .nav button {
+        height: 36px;
+        padding: 0 10px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        text-align: left;
+        color: #4d535f;
+        font: inherit;
+        font-size: 13px;
+      }
+
+      .nav button.active {
+        background: #e9ebef;
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .side-status {
+        margin-top: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        padding: 10px;
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .main {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: 70px 1fr;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid var(--line);
+        padding: 0 28px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: 0;
+      }
+
+      .target {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .pill {
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        padding: 0 10px;
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .content {
+        overflow: auto;
+        padding: 22px 28px 32px;
+      }
+
+      .page { display: none; }
+      .page.active { display: block; }
+
+      .grid { display: grid; gap: 14px; }
+      .overview-grid {
+        display: grid;
+        grid-template-columns: minmax(360px, 1fr) 320px;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .section {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--panel);
+        overflow: hidden;
+      }
+
+      .section-title {
+        min-height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 15px;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+        font-weight: 760;
+      }
+
+      .row {
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--line);
+      }
+      .row:last-child { border-bottom: 0; }
+
+      .row-main { min-width: 0; }
+      .label { font-size: 13px; font-weight: 660; }
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+        margin-top: 3px;
+        overflow-wrap: anywhere;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--faint);
+        display: inline-block;
+      }
+      .status-dot.running { background: var(--ok); }
+      .status-dot.starting { background: #c87a00; }
+      .status-dot.failed { background: var(--danger); }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .button {
+        height: 34px;
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--text);
+        padding: 0 12px;
+        font: inherit;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .button.primary {
+        background: #15171c;
+        border-color: #15171c;
+        color: #fff;
+        font-weight: 700;
+      }
+      .button.danger { border-color: #efb4ad; color: var(--danger); }
+      .button:disabled { opacity: 0.55; }
+
+      .select, .input {
+        height: 34px;
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--text);
+        padding: 0 11px;
+        font: inherit;
+        font-size: 13px;
+      }
+      .input { width: 100%; }
+
+      .plugin-toolbar {
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) 220px 240px;
+        gap: 12px;
+        margin-bottom: 16px;
+        align-items: center;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        height: 32px;
+        border: 0;
+        border-radius: 8px;
+        background: #f0f1f4;
+        padding: 0 12px;
+        color: var(--text);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: minmax(360px, 1fr) 330px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .plugin-list { display: grid; gap: 10px; }
+
+      .plugin-row {
+        min-height: 80px;
+        display: grid;
+        grid-template-columns: 48px 1fr auto;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: #fff;
+        padding: 12px;
+      }
+
+      .plugin-row.selected {
+        border-color: #aab2bf;
+        background: #fafbfc;
+      }
+
+      .plugin-icon {
+        width: 46px;
+        height: 46px;
+        border: 1px solid var(--line-strong);
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        background: #f8f9fb;
+      }
+
+      .plugin-name { font-size: 14px; font-weight: 760; margin-bottom: 4px; }
+      .plugin-desc { color: var(--muted); font-size: 12px; line-height: 1.35; }
+      .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+      .chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 7px;
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .switch {
+        width: 42px;
+        height: 24px;
+        border-radius: 999px;
+        border: 1px solid #cbd1db;
+        background: #dce1e8;
+        position: relative;
+      }
+      .switch::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .switch.on { background: var(--accent); border-color: var(--accent); }
+      .switch.on::after { left: 20px; }
+      .switch.loading { opacity: 0.65; }
+
+      .detail {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--panel);
+        padding: 15px;
+        display: grid;
+        gap: 13px;
+      }
+
+      .detail-head { display: flex; align-items: center; gap: 12px; }
+      .detail-title { font-size: 16px; font-weight: 780; }
+      .detail-sub { color: var(--muted); font-size: 12px; margin-top: 3px; overflow-wrap: anywhere; }
+
+      .code {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #f0f2f5;
+        padding: 10px;
+        font-family: var(--mono);
+        font-size: 11px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      .warning {
+        border: 1px dashed #d7b66b;
+        border-radius: 8px;
+        background: var(--warn-bg);
+        color: var(--warn-text);
+        padding: 9px;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .log {
+        min-height: 170px;
+        max-height: 300px;
+        overflow: auto;
+      }
+
+      details {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: #fff;
+        padding: 12px 15px;
+      }
+      summary { font-size: 13px; font-weight: 700; }
+      details .row { padding-left: 0; padding-right: 0; }
+
+      @media (max-width: 840px) {
+        .shell { grid-template-columns: 1fr; }
+        .sidebar { display: none; }
+        .overview-grid, .split, .plugin-toolbar { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">D</div>
+          <div>
+            <div class="brand-title">Deepseek Harness</div>
+            <div class="brand-sub">Desktop control</div>
+          </div>
+        </div>
+        <nav class="nav" id="nav"></nav>
+        <div class="side-status" id="side-status">Runtime: loading</div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <h1 id="page-title">Overview</h1>
+          <div class="target">
+            <span class="pill" id="runtime-pill"><span class="status-dot"></span> Runtime</span>
+            <span class="pill" id="profile-pill">Profile: web</span>
+          </div>
+        </header>
+
+        <section class="content">
+          <div class="page" id="page-overview">
+            <div class="overview-grid">
+              <div class="grid">
+                <div class="section">
+                  <div class="section-title">Runtime</div>
+                  <div id="overview-runtime"></div>
+                </div>
+                <div class="section">
+                  <div class="section-title">Actions</div>
+                  <div class="row">
+                    <div class="actions">
+                      <button class="button primary" id="show-web">Open Deepseek Harness</button>
+                      <button class="button" id="open-browser">Open Web in Browser</button>
+                      <button class="button" id="open-terminal">Open Terminal</button>
+                      <button class="button" id="restart-runtime">Restart Runtime</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="section">
+                <div class="section-title">Current Profile</div>
+                <div class="row">
+                  <div class="row-main">
+                    <div class="label" id="overview-profile-name">web</div>
+                    <div class="hint" id="overview-profile-command">Loading...</div>
+                  </div>
+                </div>
+                <div class="row">
+                  <select class="select" id="overview-profile-select"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-plugins">
+            <div class="plugin-toolbar">
+              <div class="tabs">
+                <button class="tab">Plugins <span id="plugin-count">0</span></button>
+              </div>
+              <select class="select" id="plugin-profile-select"></select>
+              <input class="input" id="plugin-search" placeholder="Search plugins" />
+            </div>
+            <div class="split">
+              <div class="plugin-list" id="plugin-list"></div>
+              <aside class="detail" id="plugin-detail"></aside>
+            </div>
+          </div>
+
+          <div class="page" id="page-profiles">
+            <div class="section">
+              <div class="section-title">Profiles</div>
+              <div id="profile-rows"></div>
+            </div>
+          </div>
+
+          <div class="page" id="page-diagnostics">
+            <div class="grid">
+              <div class="section">
+                <div class="section-title">
+                  <span>Diagnostics</span>
+                  <button class="button" id="copy-diagnostics">Copy diagnostics</button>
+                </div>
+                <pre class="code log" id="diagnostics-log">Loading...</pre>
+              </div>
+              <details>
+                <summary>Advanced runtime details</summary>
+                <div id="advanced-rows"></div>
+                <div class="row">
+                  <div class="row-main">
+                    <div class="label">Registry index URL</div>
+                    <div class="hint">Used by the plugin market metadata loader.</div>
+                  </div>
+                  <input class="input" id="registry-url" />
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const invoke = window.__TAURI__?.core?.invoke ?? window.__TAURI_INTERNALS__?.invoke;
+      const pages = [
+        ["overview", "Overview"],
+        ["plugins", "Plugins"],
+        ["profiles", "Profiles"],
+        ["diagnostics", "Diagnostics"],
+      ];
+      const fallbackPlugins = [
+        {
+          id: "io.github.dsh.plugin-management",
+          name: "Plugin Management",
+          package: "@dsh/plugin-management",
+          packageName: "@dsh/plugin-management",
+          description: "Discover and manage DSH profile plugins.",
+          tags: ["profile", "market"],
+          license: "MIT",
+          compatibleDshVersions: ">=0.1.0-rc.5",
+          riskNotes: ["Installs local executable package code."],
+        },
+        {
+          id: "io.github.example.github-tools",
+          name: "GitHub Tools",
+          package: "github:example/dsh-github-tools",
+          packageName: "dsh-github-tools",
+          description: "Repository context and issue workflow helpers.",
+          tags: ["tool", "github"],
+          license: "MIT",
+          compatibleDshVersions: ">=0.1.0-rc.5",
+          riskNotes: ["Git-hosted packages may need pnpm allowBuilds."],
+        },
+        {
+          id: "io.github.example.file-review",
+          name: "File Review Pack",
+          package: "github:example/dsh-file-review",
+          packageName: "dsh-file-review",
+          description: "Extra review commands for local workspaces.",
+          tags: ["review", "local"],
+          license: "Apache-2.0",
+          compatibleDshVersions: ">=0.1.0-rc.5",
+          riskNotes: ["May access selected workspace files when enabled."],
+        },
+      ];
+
+      let activePage = "overview";
+      let desktopState = null;
+      let currentProfile = localStorage.getItem("currentProfile") || "web";
+      let plugins = fallbackPlugins;
+      let selectedPlugin = fallbackPlugins[0];
+      let operationLog = "";
+      let installing = new Set();
+
+      function mustInvoke(name, args) {
+        if (!invoke) throw new Error("Tauri invoke API is unavailable");
+        return invoke(name, args);
+      }
+
+      async function loadDesktopState() {
+        desktopState = await mustInvoke("get_desktop_state");
+        const valid = desktopState.profiles.some((profile) => profile.name === currentProfile);
+        if (!valid) currentProfile = "web";
+        if (desktopState.current_profile !== currentProfile) {
+          await mustInvoke("set_current_profile", { profile: currentProfile });
+          desktopState = await mustInvoke("get_desktop_state");
+        }
+        currentProfile = desktopState.current_profile;
+        localStorage.setItem("currentProfile", currentProfile);
+        renderShellState();
+      }
+
+      function renderShellState() {
+        if (!desktopState) return;
+        const runtime = desktopState.runtime;
+        const status = runtime.status || "unknown";
+        const dotClass = ["running", "starting", "failed"].includes(status) ? status : "";
+        document.querySelector("#runtime-pill").innerHTML = `<span class="status-dot ${dotClass}"></span> ${escapeHtml(status)}`;
+        document.querySelector("#profile-pill").textContent = `Profile: ${currentProfile}`;
+        document.querySelector("#side-status").innerHTML = [
+          `Runtime: ${escapeHtml(status)}`,
+          `Profile: ${escapeHtml(currentProfile)}`,
+          escapeHtml(runtime.web_url || "URL pending"),
+        ].join("<br>");
+      }
+
+      async function setCurrentProfile(profile) {
+        currentProfile = profile;
+        localStorage.setItem("currentProfile", profile);
+        await mustInvoke("set_current_profile", { profile });
+        await loadDesktopState();
+        await refresh();
+      }
+
+      function setPage(page) {
+        if (!pages.some(([key]) => key === page)) page = "overview";
+        activePage = page;
+        if (window.location.hash.slice(1) !== page) window.location.hash = page;
+        document.querySelectorAll(".page").forEach((el) => el.classList.remove("active"));
+        document.querySelector(`#page-${page}`)?.classList.add("active");
+        document.querySelectorAll(".nav button").forEach((el) => el.classList.toggle("active", el.dataset.page === page));
+        document.querySelector("#page-title").textContent = pages.find(([key]) => key === page)?.[1] ?? "Overview";
+        refresh();
+      }
+
+      function renderNav() {
+        const nav = document.querySelector("#nav");
+        nav.innerHTML = pages.map(([key, label]) => `<button data-page="${key}">${label}</button>`).join("");
+        nav.addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-page]");
+          if (button) setPage(button.dataset.page);
+        });
+      }
+
+      function profileOptions() {
+        return (desktopState?.profiles ?? []).map((profile) => `
+          <option value="${escapeAttr(profile.name)}"${profile.name === currentProfile ? " selected" : ""}>${escapeHtml(profile.name)}</option>
+        `).join("");
+      }
+
+      function currentProfileSummary() {
+        return (desktopState?.profiles ?? []).find((profile) => profile.name === currentProfile)
+          ?? desktopState?.profiles?.[0]
+          ?? { name: "web", default_command: "dsh --profile web --port 0" };
+      }
+
+      function renderOverview() {
+        const runtime = desktopState.runtime;
+        const rows = [
+          ["Status", runtime.status],
+          ["Web URL", runtime.web_url || "not ready"],
+          ["Last error", runtime.last_error || "none"],
+          ["DSH_HOME", runtime.dsh_home],
+        ];
+        document.querySelector("#overview-runtime").innerHTML = rows.map(([label, value]) => `
+          <div class="row">
+            <div class="row-main"><div class="label">${escapeHtml(label)}</div></div>
+            <div class="hint" style="text-align:right;max-width:520px;">${escapeHtml(value)}</div>
+          </div>
+        `).join("");
+        const profile = currentProfileSummary();
+        document.querySelector("#overview-profile-name").textContent = profile.name;
+        document.querySelector("#overview-profile-command").textContent = profile.default_command;
+        document.querySelector("#overview-profile-select").innerHTML = profileOptions();
+      }
+
+      async function loadRegistry() {
+        const input = document.querySelector("#registry-url");
+        const url = input.value || localStorage.getItem("registryUrl") || "https://raw.githubusercontent.com/javen-yan/dsh-plugins/main/index.json";
+        input.value = url;
+        try {
+          const response = await fetch(url, { cache: "no-store" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          const list = Array.isArray(data) ? data : data.plugins;
+          if (Array.isArray(list) && list.length > 0) {
+            plugins = list.map(normalizePlugin);
+            localStorage.setItem("pluginRegistryCache", JSON.stringify(plugins));
+            return;
+          }
+        } catch {
+          const cached = localStorage.getItem("pluginRegistryCache");
+          if (cached) {
+            try {
+              plugins = JSON.parse(cached).map(normalizePlugin);
+              return;
+            } catch {}
+          }
+        }
+        plugins = fallbackPlugins;
+      }
+
+      function normalizePlugin(plugin) {
+        return {
+          id: plugin.id ?? plugin.name,
+          name: plugin.name ?? plugin.id,
+          package: plugin.package ?? plugin.install?.package ?? plugin.packageName,
+          packageName: plugin.packageName ?? plugin.package ?? plugin.install?.package,
+          description: plugin.description ?? "",
+          tags: plugin.tags ?? [],
+          license: plugin.license ?? "unknown",
+          compatibleDshVersions: plugin.compatibleDshVersions ?? "unknown",
+          riskNotes: plugin.riskNotes ?? [],
+        };
+      }
+
+      async function renderPlugins() {
+        document.querySelector("#plugin-profile-select").innerHTML = profileOptions();
+        const query = document.querySelector("#plugin-search").value.trim().toLowerCase();
+        const filtered = plugins.filter((plugin) => {
+          const haystack = [plugin.name, plugin.description, plugin.package, ...(plugin.tags ?? [])].join(" ").toLowerCase();
+          return haystack.includes(query);
+        });
+        document.querySelector("#plugin-count").textContent = String(filtered.length);
+        const states = await Promise.all(filtered.map(async (plugin) => {
+          try {
+            return await mustInvoke("get_plugin_state", {
+              profile: currentProfile,
+              packageName: plugin.packageName,
+            });
+          } catch {
+            return { installed: false, active: false, state: "unknown" };
+          }
+        }));
+        document.querySelector("#plugin-list").innerHTML = filtered.map((plugin, index) => {
+          const state = states[index];
+          const selected = selectedPlugin?.id === plugin.id ? " selected" : "";
+          const on = state.active ? " on" : "";
+          const loading = installing.has(plugin.id) ? " loading" : "";
+          return `
+            <div class="plugin-row${selected}" data-plugin-id="${escapeAttr(plugin.id)}">
+              <div class="plugin-icon">${escapeHtml(initials(plugin.name))}</div>
+              <div>
+                <div class="plugin-name">${escapeHtml(plugin.name)}</div>
+                <div class="plugin-desc">${escapeHtml(plugin.description)}</div>
+                <div class="chips">
+                  ${(plugin.tags ?? []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
+                  <span class="chip">${escapeHtml(state.state)}</span>
+                </div>
+              </div>
+              <button class="switch${on}${loading}" data-toggle="${escapeAttr(plugin.id)}" aria-label="Install or remove ${escapeAttr(plugin.name)}"></button>
+            </div>
+          `;
+        }).join("");
+        renderPluginDetail();
+      }
+
+      function renderPluginDetail() {
+        const plugin = selectedPlugin ?? plugins[0];
+        if (!plugin) {
+          document.querySelector("#plugin-detail").innerHTML = `<div class="hint">No plugin selected.</div>`;
+          return;
+        }
+        selectedPlugin = plugin;
+        const command = `dsh plugin --profile ${currentProfile} add ${plugin.package}`;
+        document.querySelector("#plugin-detail").innerHTML = `
+          <div class="detail-head">
+            <div class="plugin-icon">${escapeHtml(initials(plugin.name))}</div>
+            <div>
+              <div class="detail-title">${escapeHtml(plugin.name)}</div>
+              <div class="detail-sub">${escapeHtml(plugin.id)}</div>
+            </div>
+          </div>
+          <div class="pill">Install target: ${escapeHtml(currentProfile)}</div>
+          <div class="code">${escapeHtml(command)}</div>
+          <div class="warning">Plugins are local executable code. Installation runs the official dsh plugin command and may trigger package-manager scripts.</div>
+          <div>
+            <div class="label">Compatibility</div>
+            <div class="hint">${escapeHtml(plugin.compatibleDshVersions)}</div>
+          </div>
+          <div>
+            <div class="label">License</div>
+            <div class="hint">${escapeHtml(plugin.license)}</div>
+          </div>
+          <div>
+            <div class="label">Risk notes</div>
+            <div class="hint">${escapeHtml((plugin.riskNotes ?? []).join(" ") || "No extra notes.")}</div>
+          </div>
+          <pre class="code log">${escapeHtml(operationLog || "No plugin operation yet.")}</pre>
+        `;
+      }
+
+      async function togglePlugin(pluginId) {
+        const plugin = plugins.find((candidate) => candidate.id === pluginId);
+        if (!plugin) return;
+        selectedPlugin = plugin;
+        const state = await mustInvoke("get_plugin_state", {
+          profile: currentProfile,
+          packageName: plugin.packageName,
+        });
+        if (!state.installed && !localStorage.getItem("pluginInstallWarningAccepted")) {
+          const ok = confirm("Plugins are local executable code. Install only plugins you trust.");
+          if (!ok) return;
+          localStorage.setItem("pluginInstallWarningAccepted", "yes");
+        }
+        installing.add(plugin.id);
+        await renderPlugins();
+        try {
+          const operation = {
+            profile: currentProfile,
+            packageSpec: plugin.package,
+            packageName: plugin.packageName,
+          };
+          const result = state.installed
+            ? await mustInvoke("uninstall_plugin", { operation })
+            : await mustInvoke("install_plugin", { operation });
+          operationLog = [
+            `$ dsh plugin --profile ${currentProfile} ${state.installed ? "remove" : "add"} ${plugin.package}`,
+            result.stdout,
+            result.stderr,
+            result.success ? "Done. Restart Runtime to apply." : `Failed with code ${result.code ?? "unknown"}.`,
+          ].join("\n");
+        } catch (error) {
+          operationLog = String(error);
+        } finally {
+          installing.delete(plugin.id);
+          await loadDesktopState();
+          await renderPlugins();
+        }
+      }
+
+      function renderProfiles() {
+        const profiles = desktopState?.profiles ?? [];
+        document.querySelector("#profile-rows").innerHTML = profiles.map((profile) => `
+          <div class="row">
+            <div class="row-main">
+              <div class="label">${escapeHtml(profile.name)}${profile.name === currentProfile ? " · current" : ""}</div>
+              <div class="hint">${escapeHtml(profile.path)}</div>
+              <div class="hint">Default: ${escapeHtml(profile.default_command)}</div>
+            </div>
+            <div class="actions">
+              <button class="button" data-profile-set="${escapeAttr(profile.name)}">Set Default</button>
+              <button class="button" data-profile-shell="${escapeAttr(profile.name)}">Terminal</button>
+              <button class="button" data-profile-dir="${escapeAttr(profile.name)}">Open Dir</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      function renderDiagnostics() {
+        const runtime = desktopState.runtime;
+        const text = [
+          `App: ${desktopState.app_name} ${desktopState.app_version}`,
+          `Upstream: ${desktopState.upstream_version} ${desktopState.upstream_commit}`,
+          `Status: ${runtime.status}`,
+          `Current profile: ${currentProfile}`,
+          `Web URL: ${runtime.web_url ?? "not ready"}`,
+          `Last error: ${runtime.last_error ?? "none"}`,
+          "",
+          ...(runtime.log_tail ?? []),
+        ].join("\n");
+        document.querySelector("#diagnostics-log").textContent = text;
+        const advanced = [
+          ["Runtime root", runtime.runtime_root ?? "unknown"],
+          ["Node", runtime.node_binary ?? "node"],
+          ["pnpm", runtime.pnpm_binary ?? "pnpm"],
+          ["DSH_HOME", runtime.dsh_home],
+        ];
+        document.querySelector("#advanced-rows").innerHTML = advanced.map(([label, value]) => `
+          <div class="row">
+            <div class="row-main"><div class="label">${escapeHtml(label)}</div></div>
+            <div class="hint" style="text-align:right;max-width:520px;">${escapeHtml(value)}</div>
+          </div>
+        `).join("");
+      }
+
+      async function refresh() {
+        if (!desktopState) await loadDesktopState();
+        renderShellState();
+        if (activePage === "overview") renderOverview();
+        if (activePage === "plugins") await renderPlugins();
+        if (activePage === "profiles") renderProfiles();
+        if (activePage === "diagnostics") renderDiagnostics();
+      }
+
+      function initials(name) {
+        return String(name).split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+      }
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[char]);
+      }
+      function escapeAttr(value) {
+        return escapeHtml(value);
+      }
+
+      document.querySelector("#show-web").addEventListener("click", () => mustInvoke("show_web"));
+      document.querySelector("#open-browser").addEventListener("click", () => mustInvoke("open_web_in_browser"));
+      document.querySelector("#open-terminal").addEventListener("click", () => mustInvoke("open_profile_shell", { profile: currentProfile }));
+      document.querySelector("#restart-runtime").addEventListener("click", async () => {
+        await mustInvoke("restart_runtime");
+        await loadDesktopState();
+        await refresh();
+      });
+      document.querySelector("#overview-profile-select").addEventListener("change", (event) => setCurrentProfile(event.target.value));
+      document.querySelector("#plugin-profile-select").addEventListener("change", (event) => setCurrentProfile(event.target.value));
+      document.querySelector("#plugin-search").addEventListener("input", () => renderPlugins());
+      document.querySelector("#plugin-list").addEventListener("click", async (event) => {
+        const toggle = event.target.closest("[data-toggle]");
+        if (toggle) {
+          await togglePlugin(toggle.dataset.toggle);
+          return;
+        }
+        const row = event.target.closest("[data-plugin-id]");
+        if (row) {
+          selectedPlugin = plugins.find((plugin) => plugin.id === row.dataset.pluginId);
+          await renderPlugins();
+        }
+      });
+      document.querySelector("#profile-rows").addEventListener("click", async (event) => {
+        const set = event.target.closest("[data-profile-set]");
+        const shell = event.target.closest("[data-profile-shell]");
+        const dir = event.target.closest("[data-profile-dir]");
+        if (set) await setCurrentProfile(set.dataset.profileSet);
+        if (shell) await mustInvoke("open_profile_shell", { profile: shell.dataset.profileShell });
+        if (dir) await mustInvoke("open_profile_directory", { profile: dir.dataset.profileDir });
+      });
+      document.querySelector("#copy-diagnostics").addEventListener("click", async () => {
+        document.querySelector("#diagnostics-log").textContent = await mustInvoke("copy_diagnostics");
+      });
+      document.querySelector("#registry-url").addEventListener("change", async (event) => {
+        localStorage.setItem("registryUrl", event.target.value);
+        await loadRegistry();
+        await renderPlugins();
+      });
+      window.addEventListener("settings-page", (event) => setPage(event.detail));
+      window.addEventListener("hashchange", () => setPage(window.location.hash.slice(1) || "overview"));
+
+      renderNav();
+      loadRegistry()
+        .then(loadDesktopState)
+        .then(() => setPage(window.location.hash.slice(1) || "overview"))
+        .catch((error) => {
+          document.querySelector("#side-status").textContent = String(error);
+        });
+      setInterval(async () => {
+        try {
+          await loadDesktopState();
+          await refresh();
+        } catch {}
+      }, 5000);
+    </script>
+  </body>
+</html>
