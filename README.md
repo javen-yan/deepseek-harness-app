@@ -1,3 +1,5 @@
+这个项目只是我自己用的，现在也有一些开源比较好的，后期我后转到plugin开发中这个维护， 你们想研究的可以试试
+
 # Deepseek Harness App
 
 Desktop host for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
